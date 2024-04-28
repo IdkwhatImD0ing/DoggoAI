@@ -5,8 +5,10 @@ import collections
 import wave
 import io
 import asyncio
+import base64
 from concurrent.futures import ThreadPoolExecutor
 from openai import AsyncOpenAI
+import json
 
 
 class VoiceActivityDetector:
@@ -16,6 +18,7 @@ class VoiceActivityDetector:
         loop,
         stop_event,
         history,
+        hume_socket,
         rate=16000,
         format=pyaudio.paInt16,
         channels=1,
@@ -23,9 +26,10 @@ class VoiceActivityDetector:
         silence_threshold=200,
     ):
         self.loop = loop
-        self.stop_event = stop_event #! TODO: Implement flagging code
+        self.stop_event = stop_event  #! TODO: Implement flagging code
         self.history = history
-        self.interruption_queue = interruption_queue # Interruption Queue
+        self.hume_socket = hume_socket
+        self.interruption_queue = interruption_queue  # Interruption Queue
         self.rate = rate
         self.format = format
         self.channels = channels
@@ -115,22 +119,69 @@ class VoiceActivityDetector:
                 wf.setframerate(self.rate)
                 wf.writeframes(audio_data)
             wav_data = wav_buffer.getvalue()
-            
+
             # Save to file
             # with open(f"input{self.count}.wav", "wb") as f:
             #     self.count +=1
             #     f.write(wav_data)
             audio_stream = io.BytesIO(wav_data)
             audio_stream.name = "audio.wav"
-            transcript = await self.client.audio.transcriptions.create(
-                model="whisper-1", file=audio_stream, response_format="text", language="en"
+
+            # Save as wav file
+            with open("audio.wav", "wb") as f:
+                f.write(wav_data)
+
+            transcript_task = self.client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_stream,
+                response_format="text",
+                language="en",
             )
-            await self.interruption_queue.put(transcript)
+
+            # base64 encode wav
+            base64_audio = base64.b64encode(wav_data).decode()
+
+            audio_task = self.process_hume(base64_audio)
+
+            transcript, audio_emotions = await asyncio.gather(
+                transcript_task, audio_task
+            )
+            # print("VoiceActivityDetector - Emotions:", audio_emotions)
+
+            # TODO: pass audio and video to GPT
+            emotional_context_transcript = {
+                "transcript": transcript,
+                "audio_emotions": audio_emotions,
+            }
+
+            await self.interruption_queue.put(emotional_context_transcript)
             self.history.append({"role": "user", "content": transcript})
             print("VoiceActivityDetector - Added to queue:", transcript)
 
         except Exception as e:
             print("Failed to transcribe:", str(e))
+
+    async def process_hume(self, audio_base64):
+        data = {"data": audio_base64, "models": {"prosody": {}}}
+
+        await self.hume_socket.send(json.dumps(data))
+
+        response = await self.hume_socket.recv()
+        response = json.loads(response)
+
+        # * Emotions has {"name": "anger", "score": 0.5}
+        emotions = (
+            response.get("prosody", {}).get("predictions", [])[0].get("emotions", [])
+        )
+        # Find top 3 emotions and format them
+        emotions = sorted(emotions, key=lambda e: e["score"], reverse=True)[:3]
+        pretty_emotions = "Voice Emotions:\n"
+        for i, emotion in enumerate(emotions):
+            pretty_emotions += (
+                f"Emotion {i + 1}: {emotion['name']} ({emotion['score']:.2%})\n"
+            )
+
+        return pretty_emotions
 
     def close(self):
         self.stream.stop_stream()
