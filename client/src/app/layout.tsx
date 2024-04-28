@@ -23,11 +23,11 @@ export default function RootLayout({
             <body
                 className={cn(
                     poppins.className,
-                    "bg-jas-blue flex min-h-[100vh] pl-4 pt-4",
+                    "bg-jas-blue flex min-h-[100vh] p-4",
                 )}
             >
                 <Navbar />
-                <div className="pl-[5rem]">{children}</div>
+                <div className="ml-[8rem]">{children}</div>
             </body>
         </html>
     );

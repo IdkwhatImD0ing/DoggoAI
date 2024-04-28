@@ -14,6 +14,7 @@ export const HoverEffect = ({
         tags: string[];
         link: string;
         id: number;
+        background: string;
     }[];
     className?: string;
 }) => {
@@ -46,10 +47,23 @@ export const HoverEffect = ({
                             />
                         )}
                     </AnimatePresence>
-                    <Card className="flex-center border-2 border-gray-300 text-center">
+                    <Card
+                        className={cn(
+                            "flex-center border-4 border-[#CECECE] text-center",
+                        )}
+                    >
                         <img
-                            src="/bear.svg"
-                            className="h-36 w-full bg-gray-400"
+                            src={
+                                idx == 0
+                                    ? "/cow.png"
+                                    : idx == 1
+                                      ? "/horse.png"
+                                      : "/pig.png"
+                            }
+                            className={cn(
+                                "h-36 w-full bg-gray-400",
+                                item?.background,
+                            )}
                         />
                         <CardTitle>{item.title}</CardTitle>
                         <div className="flex-center flex-row space-x-2 pt-2">

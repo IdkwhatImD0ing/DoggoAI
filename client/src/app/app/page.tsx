@@ -7,31 +7,22 @@ const STORIES = [
     {
         id: 1,
         title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
+        tags: ["animals", "grazing"],
+        background: "bg-jas-pink",
         link: "k3v.in",
     },
     {
         id: 2,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
+        title: "Riding horses",
+        tags: ["animals", "grazing"],
+        background: "bg-jas-green",
         link: "k3v.in",
     },
     {
         id: 3,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
-        link: "k3v.in",
-    },
-    {
-        id: 4,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
-        link: "k3v.in",
-    },
-    {
-        id: 5,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
+        title: "Pigs in the barn",
+        tags: ["animals", "grazing"],
+        background: "bg-jas-teal",
         link: "k3v.in",
     },
 ];
@@ -53,10 +44,10 @@ const EMOTIONS = [
 
 const Page = () => {
     return (
-        <div className="w-full overflow-auto pl-16 pr-8 pt-10">
+        <div className="h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] w-full overflow-auto rounded-3xl bg-white p-12">
             <div className="space-y-2">
                 <h1 className="text-5xl font-bold">Welcome back, Jasmine</h1>
-                <h2 className="text-2xl font-semibold text-gray-400">
+                <h2 className="text-2xl font-semibold text-[#808080]">
                     You have 2 stories waiting for you!
                 </h2>
             </div>
@@ -65,23 +56,24 @@ const Page = () => {
                 {/* Contains all elements */}
                 <div className="max-h-fit w-full space-y-4">
                     {/* Contains non-statistical */}
-                    <div className="flex-between rounded-lg border-4 border-dashed border-gray-400 bg-gray-400 bg-clip-padding p-6">
-                        <div className="flex h-full flex-col justify-between space-y-12 pt-4">
+                    <div className="flex-between rounded-lg border-[6px] border-dashed border-[#D6D6D6] bg-[#F3F5F7] bg-clip-padding px-12">
+                        <div className="my-8 flex h-full flex-col justify-between space-y-8">
                             <h3 className="text-4xl font-bold">
-                                Create a new story!
+                                Create a story!
                             </h3>
 
                             <HoverBorderGradient
-                                className="flex-center w-60 space-x-2 py-4 text-2xl"
+                                className="flex-center bg-jas-blue w-48 space-x-2 py-4 text-xl"
                                 duration={0.1}
                             >
-                                <Sparkles /> <p>make magic</p>
+                                <Sparkles />{" "}
+                                <p className="font-medium">Make magic</p>
                             </HoverBorderGradient>
                         </div>
-                        <img src="/bear.svg" />
+                        <img src="/dog.svg" className="max-h-40" />
                     </div>
 
-                    <div className="space-y-2 rounded-xl bg-gray-100 p-6">
+                    <div className="border-jas-outline space-y-2 rounded-xl border-[6px] bg-white p-6">
                         <h4 className="px-2 text-2xl font-bold">
                             Your Stories
                         </h4>
