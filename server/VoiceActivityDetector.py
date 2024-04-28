@@ -5,8 +5,12 @@ import collections
 import wave
 import io
 import asyncio
+import base64
 from concurrent.futures import ThreadPoolExecutor
 from openai import AsyncOpenAI
+
+from hume_audio import process_audio
+from hume_video import process_frame, simple_capture
 
 
 class VoiceActivityDetector:
@@ -125,6 +129,21 @@ class VoiceActivityDetector:
             transcript = await self.client.audio.transcriptions.create(
                 model="whisper-1", file=audio_stream, response_format="text", language="en"
             )
+
+            try:
+                bbox, prob, video_emotions = await process_frame(simple_capture())
+            except Exception as e:
+                print("Error getting video emotions", e)
+
+            audio_stream.seek(0)
+            base64_audio = base64.b64encode(audio_stream.read()).decode('utf-8')
+
+            audio_emotions = await process_audio(base64_audio)
+
+            print(video_emotions, audio_emotions)
+
+            # TODO: pass audio and video to GPT
+
             await self.interruption_queue.put(transcript)
             self.history.append({"role": "user", "content": transcript})
             print("VoiceActivityDetector - Added to queue:", transcript)
