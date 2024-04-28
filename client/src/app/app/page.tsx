@@ -22,7 +22,7 @@ const STORIES = [
         id: 3,
         title: "Pigs in the barn",
         tags: ["animals", "grazing"],
-        background: "bg-jas-teal",
+        background: "bg-jas-purple",
         link: "k3v.in",
     },
 ];
@@ -105,7 +105,12 @@ const Page = () => {
                                 in the stories through unique twists and turns!
                             </p>
                         </div>
-                        <div className="bg-jas-pink h-48 rounded-xl"></div>
+                        <div className="bg-jas-blue relative h-48 rounded-xl">
+                            <img
+                                src="/unicorn.png"
+                                className="absolute bottom-0 right-2"
+                            />
+                        </div>
                     </div>
 
                     <div className="border-jas-outline w-full space-y-6 rounded-xl border-[6px] bg-white p-6">

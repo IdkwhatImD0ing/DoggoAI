@@ -57,13 +57,14 @@ const config = {
                 },
                 jas: {
                     gray: "#4D4D4D",
-                    pink: "#FFA9A9",
-                    green: "#84CD78",
+                    pink: "#FF7384",
+                    green: "#64E150",
                     darkBlue: "#1C4A6A",
                     teal: "#42D5EE",
                     card: "#F0F5F6",
                     outline: "#F1F1F1",
                     blue: "#008BEF",
+                    purple: "#6D28FF",
                 },
             },
             borderRadius: {
