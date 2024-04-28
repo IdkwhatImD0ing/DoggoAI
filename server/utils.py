@@ -7,6 +7,7 @@ async def text_chunker(chunks):
         message = text.choices[0].delta.content
         if message == None:
             yield None
+            break
         buffer += message
 
         # Find the last occurrence of any sentence-ending punctuation in the buffer
