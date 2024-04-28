@@ -1,7 +1,12 @@
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import {
     BookCopy,
+    BookMarked,
+    Box,
+    CreditCard,
     Dog,
+    Gift,
     Pencil,
     Plus,
     Search,
@@ -29,25 +34,26 @@ const TOPICS = [
         icon: Pencil,
         title: "things",
     },
-    {
-        id: 5,
-        icon: Pencil,
-        title: "things",
-    },
 ];
 
 const GIFTS = [
     {
         title: "Send a gift",
         description: "send a surprise gift to a random hospital patient!",
+        background: "bg-jas-pink",
+        icon: Gift,
     },
     {
         title: "Donate care package",
         description: "fund a gift for a stranger!",
+        background: "bg-jas-purple",
+        icon: Box,
     },
     {
         title: "Write a card",
         description: "Send a get well card to a hospital patient!",
+        background: "bg-jas-green",
+        icon: CreditCard,
     },
 ];
 
@@ -86,44 +92,43 @@ const VIDEOS = [
 
 const Page = () => {
     return (
-        <div className="w-full overflow-auto pl-16 pr-8 pt-10">
+        <div className="h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] overflow-auto rounded-3xl bg-white p-12">
             <div className="space-y-2">
-                <h1 className="text-5xl font-bold">
-                    Find your favorite stories!
-                </h1>
+                <h1 className="text-5xl font-bold">Find a story</h1>
             </div>
 
             <div className="flex flex-row space-x-12 pt-8">
                 <div className="max-h-fit w-full space-y-12">
-                    <div className="space-y-4">
+                    <div className="space-y-8">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 w-5 -translate-y-1/2 transform" />
+                            <Search className="absolute left-4 top-1/2 w-5 -translate-y-1/2 transform" />
                             <Input
-                                className="h-12 rounded-full bg-gray-200 pl-10"
+                                className="border-jas-outline h-12 rounded-full border-4 bg-white pl-10"
                                 placeholder="search"
                             />
                         </div>
-                        <div className="space-y-4 rounded-xl bg-gray-200 p-6">
+
+                        <div className="border-jas-outline space-y-4 rounded-xl border-4 bg-white p-6">
                             <p className="text-2xl font-bold">Select a topic</p>
                             <div className="flex flex-row space-x-4 overflow-auto">
                                 {TOPICS.map((topic) => (
                                     <div
-                                        className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400"
+                                        className="flex-center hover:bg-jas-card hover:border-jas-blue group h-40 w-32 min-w-32 cursor-pointer flex-col space-y-2 rounded-xl hover:border-4"
                                         key={topic.id}
                                     >
-                                        <div className="flex-center h-24 w-24 rounded-xl bg-gray-400 group-hover:bg-gray-900">
-                                            <topic.icon className="h-12 w-12 group-hover:text-white" />
+                                        <div className="flex-center group-hover:bg-jas-blue h-24 w-24 rounded-xl bg-[#3F3F3F]">
+                                            <topic.icon className="h-12 w-12 text-white group-hover:text-white" />
                                         </div>
-                                        <p className="text-xl font-bold">
+                                        <p className="text-xl font-semibold">
                                             {topic.title}
                                         </p>
                                     </div>
                                 ))}
-                                <div className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400">
-                                    <div className="flex-center h-24 w-24 rounded-xl border-4 border-dotted">
-                                        <Plus className="h-12 w-12 group-hover:text-white" />
+                                <div className="flex-center group group h-40 w-32 min-w-32 cursor-pointer flex-col space-y-2 rounded-xl">
+                                    <div className="flex-center group-hover:bg-jas-gray/10 h-24 w-24 rounded-xl border-[6px] border-dotted border-[#868686] bg-clip-padding">
+                                        <Plus className="h-12 w-12 text-[#868686]" />
                                     </div>
-                                    <p className="text-xl font-bold">
+                                    <p className="text-xl font-semibold">
                                         See more...
                                     </p>
                                 </div>
@@ -157,38 +162,45 @@ const Page = () => {
                 </div>
 
                 <div className="w-[450px] min-w-[450px] space-y-4">
-                    <div className="max-w-[85%] space-y-6 rounded-xl bg-gray-100 p-6">
+                    <div className="border-jas-outline max-w-[85%] space-y-6 rounded-xl border-4 bg-white p-6">
                         <div className="space-y-3">
-                            <div className="w-fit rounded-full bg-gray-200 px-3 py-1">
-                                Your impact
+                            <div className="bg-jas-outline text-jas-gray flex-center w-fit space-x-2 rounded-full px-3 py-2 font-semibold">
+                                <BookMarked className="h-4 w-4" />
+                                <p>Learning style</p>
                             </div>
                             <div className="space-y-3">
                                 <p className="text-3xl font-bold">
                                     Your story tokens
                                 </p>
-                                <p>
+                                <p className="text-[#7b7b7b]">
                                     Story tokens are used to measure the impact
                                     of your stories in your communities!
                                 </p>
                             </div>
                         </div>
 
-                        <div className="space-y-2 rounded-xl bg-white p-4">
-                            <p className="text-4xl font-bold">562 tokens</p>
-                            <p>24 stories made. 251 people impacted</p>
+                        <div className="border-jas-outline space-y-2 rounded-xl border-[3px] bg-white p-4">
+                            <div className="flex items-center space-x-1 text-4xl font-bold">
+                                <img src="/token.svg" />
+                                <p>562 tokens</p>
+                            </div>
+                            <p className="leading-snug text-[#7b7b7b]">
+                                24 stories made. 251 people impacted
+                            </p>
                         </div>
                     </div>
 
-                    <div className="max-w-[85%] space-y-6 rounded-xl bg-gray-100 p-6">
-                        <div className="space-y-2">
-                            <div className="w-fit rounded-full bg-gray-200 px-3 py-1">
-                                Social impact
+                    <div className="border-jas-outline max-w-[85%] space-y-6 rounded-xl border-4 bg-white p-6">
+                        <div className="space-y-3">
+                            <div className="bg-jas-outline text-jas-gray flex-center w-fit space-x-2 rounded-full px-3 py-2 font-semibold">
+                                <BookMarked className="h-4 w-4" />
+                                <p>Social Impact</p>
                             </div>
-                            <div className="space-y-1">
+                            <div className="space-y-3">
                                 <p className="text-3xl font-bold">
                                     Send Kindness
                                 </p>
-                                <p>
+                                <p className="text-[#7b7b7b]">
                                     Use your tokens to propel change and create
                                     a random act of kindness!
                                 </p>
@@ -197,15 +209,20 @@ const Page = () => {
 
                         <div className="flex flex-col space-y-4">
                             {GIFTS.map((item) => (
-                                <div className="flex flex-row space-x-4 rounded-xl bg-white p-4">
-                                    <div className="h-20 w-20 min-w-20 rounded-xl bg-gray-400">
-                                        <img className="object-cover" />
+                                <div className="border-jas-outline flex flex-row items-center space-x-4 rounded-xl border-[3px] bg-white p-4">
+                                    <div
+                                        className={cn(
+                                            "flex-center h-20 w-20 min-w-20 rounded-xl bg-gray-400 text-white",
+                                            item.background,
+                                        )}
+                                    >
+                                        <item.icon className="h-10 w-10" />
                                     </div>
-                                    <div className="space-y-1">
+                                    <div className="space-y-1 text-sm">
                                         <p className="text-2xl font-bold">
                                             {item.title}
                                         </p>
-                                        <p className="leading-snug">
+                                        <p className="leading-snug text-[#7b7b7b]">
                                             {item.description}
                                         </p>
                                     </div>

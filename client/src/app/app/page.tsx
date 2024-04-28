@@ -86,7 +86,7 @@ const Page = () => {
 
                 <div className="w-[400px] min-w-[400px] space-y-4">
                     <div className="border-jas-outline w-full space-y-3 rounded-xl border-[6px] bg-white p-6">
-                        <div className="bg-jas-outline text-jas-gray flex-center w-fit space-x-1 rounded-full px-3 py-2 font-medium">
+                        <div className="bg-jas-outline text-jas-gray flex-center w-fit space-x-2 rounded-full px-3 py-2 font-semibold">
                             <BookMarked className="h-4 w-4" />
                             <p>Learning style</p>
                         </div>
