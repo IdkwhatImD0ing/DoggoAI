@@ -13,8 +13,9 @@ dotenv.load_dotenv()
 
 
 class HumeVideoFeed:
-    def __init__(self, socket, loop, video_emotions):
+    def __init__(self, socket, loop, video_emotions, server_socket):
         self.socket = socket
+        self.server_socket = server_socket
         self.loop = loop
         self.bbox = {"x": 0, "y": 0, "w": 0, "h": 0}
         self.prob = 0.0
@@ -75,7 +76,16 @@ class HumeVideoFeed:
                         (255, 255, 255),
                         2,
                     )
-            cv2.imwrite("frame.jpg", frame)
+
+            # Convert frame to base64 image, and also send to server
+            frame_base64 = base64.b64encode(cv2.imencode(".jpg", frame)[1]).decode()
+            data = {
+                "event": "video",
+                "data": frame_base64,
+            }
+            asyncio.run_coroutine_threadsafe(
+                self.server_socket.send(json.dumps(data)), self.loop
+            )
 
     async def process_hume(self, frame):
         try:
@@ -108,6 +118,15 @@ class HumeVideoFeed:
                 self.video_emotions[0] = pretty_emotions[0]
                 self.video_emotions[1] = pretty_emotions[1]
                 self.video_emotions[2] = pretty_emotions[2]
+
+                await self.server_socket.send(
+                    json.dumps(
+                        {
+                            "event": "video_emotions",
+                            "emotions": pretty_emotions,
+                        }
+                    )
+                )
 
         except Exception as e:
             print("Error - HumeVideoFeed:", str(e))

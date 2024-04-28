@@ -19,6 +19,7 @@ class VoiceActivityDetector:
         stop_event,
         history,
         hume_socket,
+        server_socket,
         rate=16000,
         format=pyaudio.paInt16,
         channels=1,
@@ -26,9 +27,10 @@ class VoiceActivityDetector:
         silence_threshold=200,
     ):
         self.loop = loop
-        self.stop_event = stop_event  #! TODO: Implement flagging code
+        self.stop_event = stop_event
         self.history = history
         self.hume_socket = hume_socket
+        self.server_socket = server_socket
         self.interruption_queue = interruption_queue  # Interruption Queue
         self.rate = rate
         self.format = format
@@ -149,12 +151,26 @@ class VoiceActivityDetector:
             # print("VoiceActivityDetector - Emotions:", audio_emotions)
 
             # TODO: pass audio and video to GPT
-            emotional_context_transcript = {
+            emotion_context = {
+                "event": "user",
                 "transcript": transcript,
                 "audio_emotions": audio_emotions,
             }
 
-            await self.interruption_queue.put(emotional_context_transcript)
+            await self.server_socket.send(json.dumps(emotion_context))
+
+            pretty_emotions = "Voice Emotions:\n"
+            for i, emotion in enumerate(audio_emotions):
+                pretty_emotions += (
+                    f"Emotion {i + 1}: {emotion['name']} ({emotion['score']:.2%})\n"
+                )
+
+            emotion_context = {
+                "transcript": transcript,
+                "audio_emotions": pretty_emotions,
+            }
+
+            await self.interruption_queue.put(emotion_context)
             self.history.append({"role": "user", "content": transcript})
             print("VoiceActivityDetector - Added to queue:", transcript)
 
@@ -175,13 +191,13 @@ class VoiceActivityDetector:
         )
         # Find top 3 emotions and format them
         emotions = sorted(emotions, key=lambda e: e["score"], reverse=True)[:3]
-        pretty_emotions = "Voice Emotions:\n"
-        for i, emotion in enumerate(emotions):
-            pretty_emotions += (
-                f"Emotion {i + 1}: {emotion['name']} ({emotion['score']:.2%})\n"
+        audio_emotions = []
+        for emotion in emotions:
+            audio_emotions.append(
+                {"emotion": emotion["name"], "score": emotion["score"]}
             )
 
-        return pretty_emotions
+        return audio_emotions
 
     def close(self):
         self.stream.stop_stream()
