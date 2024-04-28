@@ -44,7 +44,7 @@ const EMOTIONS = [
 
 const Page = () => {
     return (
-        <div className="h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] w-full overflow-auto rounded-3xl bg-white p-12">
+        <div className="h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] overflow-auto rounded-3xl bg-white p-12">
             <div className="space-y-2">
                 <h1 className="text-5xl font-bold">Welcome back, Jasmine</h1>
                 <h2 className="text-2xl font-semibold text-[#808080]">
@@ -53,9 +53,7 @@ const Page = () => {
             </div>
 
             <div className="flex flex-row space-x-12 pt-8">
-                {/* Contains all elements */}
                 <div className="max-h-fit w-full space-y-4">
-                    {/* Contains non-statistical */}
                     <div className="flex-between rounded-lg border-[6px] border-dashed border-[#D6D6D6] bg-[#F3F5F7] bg-clip-padding px-12">
                         <div className="my-8 flex h-full flex-col justify-between space-y-8">
                             <h3 className="text-4xl font-bold">

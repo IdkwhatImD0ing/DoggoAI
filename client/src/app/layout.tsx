@@ -27,7 +27,9 @@ export default function RootLayout({
                 )}
             >
                 <Navbar />
-                <div className="ml-[8rem]">{children}</div>
+                <div className="ml-[8rem] min-w-[calc(100vw-160px)]">
+                    {children}
+                </div>
             </body>
         </html>
     );
