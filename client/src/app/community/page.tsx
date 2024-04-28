@@ -55,17 +55,14 @@ const Page = () => {
     return (
         <div className="w-full overflow-auto pl-16 pr-8 pt-10">
             <div className="space-y-2">
-                <h1 className="text-5xl font-bold">Welcome back, Jasmine</h1>
-                <h2 className="text-2xl font-semibold text-gray-400">
-                    You have 2 stories waiting for you!
-                </h2>
+                <h1 className="text-5xl font-bold">
+                    Find your favorite stories!
+                </h1>
             </div>
 
             <div className="flex flex-row space-x-12 pt-8">
-                {/* Contains all elements */}
                 <div className="max-h-fit w-full space-y-4">
-                    {/* Contains non-statistical */}
-                    <div className="flex-between rounded-lg border-4 border-dashed border-gray-400 bg-gray-400 bg-clip-padding p-6">
+                    {/* <div className="flex-between rounded-lg border-4 border-dashed border-gray-400 bg-gray-400 bg-clip-padding p-6">
                         <div className="flex h-full flex-col justify-between space-y-12 pt-4">
                             <h3 className="text-4xl font-bold">
                                 Create a new story!
@@ -91,31 +88,31 @@ const Page = () => {
                     <div className="space-y-2 rounded-xl bg-gray-100 p-6">
                         <h4 className="px-2 text-2xl font-bold">Your Words</h4>
                         <HoverEffect items={STORIES} className="py-0" />
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="w-[450px] min-w-[450px] space-y-4">
                     {/*Contains statistical */}
-                    <div className="max-w-[85%] space-y-3 rounded-xl bg-gray-100 p-6">
-                        <div className="w-fit rounded-full bg-gray-200 px-3 py-1">
-                            Learning style
+                    <div className="max-w-[85%] space-y-6 rounded-xl bg-gray-100 p-6">
+                        <div className="space-y-3">
+                            <div className="w-fit rounded-full bg-gray-200 px-3 py-1">
+                                Your impact
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-3xl font-bold">
+                                    Your story tokens
+                                </p>
+                                <p>
+                                    Story tokens are used to measure the impact
+                                    of your stories in your communities!
+                                </p>
+                            </div>
                         </div>
 
-                        <div>
-                            <p className="text-xl font-semibold text-gray-400">
-                                You are a
-                            </p>
-                            <p className="text-3xl font-bold">
-                                whimsical learner
-                            </p>
+                        <div className="space-y-2 rounded-xl bg-white p-4">
+                            <p className="text-4xl font-bold">562 tokens</p>
+                            <p>24 stories made. 251 people impacted</p>
                         </div>
-                        <div>
-                            <p>
-                                You are creative and love to expand on details
-                                in the stories through unique twists and turns!
-                            </p>
-                        </div>
-                        <div className="h-52 bg-gray-300"></div>
                     </div>
 
                     <div className="max-w-[85%] space-y-6 rounded-xl bg-gray-100 p-6">
