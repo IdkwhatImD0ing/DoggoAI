@@ -51,6 +51,39 @@ const GIFTS = [
     },
 ];
 
+const VIDEOS = [
+    {
+        id: 1,
+        title: "Cultivating the farm",
+        tags: ["farming"],
+    },
+    {
+        id: 2,
+        title: "Cultivating the farm",
+        tags: ["farming"],
+    },
+    {
+        id: 3,
+        title: "Cultivating the farm",
+        tags: ["farming"],
+    },
+    {
+        id: 4,
+        title: "Cultivating the farm",
+        tags: ["farming", "farming"],
+    },
+    {
+        id: 5,
+        title: "Cultivating the farm",
+        tags: ["farming", "farming"],
+    },
+    {
+        id: 6,
+        title: "Cultivating the farm",
+        tags: ["farming"],
+    },
+];
+
 const Page = () => {
     return (
         <div className="w-full overflow-auto pl-16 pr-8 pt-10">
@@ -61,39 +94,65 @@ const Page = () => {
             </div>
 
             <div className="flex flex-row space-x-12 pt-8">
-                <div className="max-h-fit w-full space-y-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 w-5 -translate-y-1/2 transform" />
-                        <Input
-                            className="h-12 rounded-full bg-gray-200 pl-10"
-                            placeholder="search"
-                        />
-                    </div>
-
-                    <div className="space-y-4 rounded-xl bg-gray-200 p-6">
-                        <p className="text-2xl font-bold">Select a topic</p>
-
-                        <div className="flex flex-row space-x-4 overflow-auto">
-                            {TOPICS.map((topic) => (
-                                <div
-                                    className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400"
-                                    key={topic.id}
-                                >
-                                    <div className="flex-center h-24 w-24 rounded-xl bg-gray-400 group-hover:bg-gray-900">
-                                        <topic.icon className="h-12 w-12 group-hover:text-white" />
+                <div className="max-h-fit w-full space-y-12">
+                    <div className="space-y-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 w-5 -translate-y-1/2 transform" />
+                            <Input
+                                className="h-12 rounded-full bg-gray-200 pl-10"
+                                placeholder="search"
+                            />
+                        </div>
+                        <div className="space-y-4 rounded-xl bg-gray-200 p-6">
+                            <p className="text-2xl font-bold">Select a topic</p>
+                            <div className="flex flex-row space-x-4 overflow-auto">
+                                {TOPICS.map((topic) => (
+                                    <div
+                                        className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400"
+                                        key={topic.id}
+                                    >
+                                        <div className="flex-center h-24 w-24 rounded-xl bg-gray-400 group-hover:bg-gray-900">
+                                            <topic.icon className="h-12 w-12 group-hover:text-white" />
+                                        </div>
+                                        <p className="text-xl font-bold">
+                                            {topic.title}
+                                        </p>
+                                    </div>
+                                ))}
+                                <div className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400">
+                                    <div className="flex-center h-24 w-24 rounded-xl border-4 border-dotted">
+                                        <Plus className="h-12 w-12 group-hover:text-white" />
                                     </div>
                                     <p className="text-xl font-bold">
-                                        {topic.title}
+                                        See more...
                                     </p>
                                 </div>
-                            ))}
-                            <div className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400">
-                                <div className="flex-center h-24 w-24 rounded-xl border-4 border-dotted">
-                                    <Plus className="h-12 w-12 group-hover:text-white" />
-                                </div>
-                                <p className="text-xl font-bold">See more...</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-x-8 gap-y-8">
+                        {VIDEOS.map((video) => (
+                            <div className="relative rounded-xl border-2 border-gray-200 bg-white p-4">
+                                <div className="absolute -top-[8%] left-[50%] h-8 w-32 -translate-x-1/2 transform bg-gray-300" />
+                                <div className="w-74 flex-center h-40 max-h-40 bg-gray-200">
+                                    video
+                                </div>
+
+                                <div className="space-y-2 text-center">
+                                    <h4 className="mt-4 text-xl font-bold text-black">
+                                        {video.title}
+                                    </h4>
+                                    <div className="flex-center mx-auto flex-row space-x-2">
+                                        {video.tags.map((tag) => (
+                                            <p className="w-fit rounded-full bg-gray-200 px-2 py-1 text-sm font-medium leading-relaxed tracking-wide text-zinc-800">
+                                                {tag}
+                                            </p>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
