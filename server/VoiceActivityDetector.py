@@ -149,8 +149,12 @@ class VoiceActivityDetector:
             print("VoiceActivityDetector - Emotions:", audio_emotions)
 
             # TODO: pass audio and video to GPT
+            emotional_context_transcript = {
+                "transcript": transcript,
+                "audio_emotions": audio_emotions,
+            }
 
-            await self.interruption_queue.put(transcript)
+            await self.interruption_queue.put(emotional_context_transcript)
             self.history.append({"role": "user", "content": transcript})
             print("VoiceActivityDetector - Added to queue:", transcript)
 
@@ -170,8 +174,8 @@ class VoiceActivityDetector:
             response.get("prosody", {}).get("predictions", [])[0].get("emotions", [])
         )
         # Find top 3 emotions and format them
-        emotions = sorted(emotions, key=lambda e: e["score"], reverse=True)[:2]
-        pretty_emotions = ""
+        emotions = sorted(emotions, key=lambda e: e["score"], reverse=True)[:3]
+        pretty_emotions = "Voice Emotions:\n"
         for i, emotion in enumerate(emotions):
             pretty_emotions += (
                 f"Emotion {i + 1}: {emotion['name']} ({emotion['score']:.2%})\n"

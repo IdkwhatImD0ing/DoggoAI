@@ -13,12 +13,12 @@ dotenv.load_dotenv()
 
 
 class HumeVideoFeed:
-    def __init__(self, socket, loop, emotions):
+    def __init__(self, socket, loop, video_emotions):
         self.socket = socket
         self.loop = loop
         self.bbox = {"x": 0, "y": 0, "w": 0, "h": 0}
         self.prob = 0.0
-        self.emotions = emotions
+        self.video_emotions = video_emotions
 
     def start_process(self):
         self.thread = threading.Thread(target=self.process_video)
@@ -63,17 +63,18 @@ class HumeVideoFeed:
                 (0, 255, 0),
                 2,
             )
-            for i, emotion in enumerate(self.emotions):
-                text = f"{emotion['emotion']}: {emotion['score']:.2f}"
-                cv2.putText(
-                    frame,
-                    text,
-                    (10, 30 * (i + 1)),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.9,
-                    (255, 255, 255),
-                    2,
-                )
+            for i, emotion in enumerate(self.video_emotions):
+                if emotion:
+                    text = f"{emotion['emotion']}: {emotion['score']:.2f}"
+                    cv2.putText(
+                        frame,
+                        text,
+                        (10, 30 * (i + 1)),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.9,
+                        (255, 255, 255),
+                        2,
+                    )
             cv2.imwrite("frame.jpg", frame)
 
     async def process_hume(self, frame):
@@ -93,18 +94,20 @@ class HumeVideoFeed:
                     prediction["emotions"],
                     key=lambda e: e["score"],
                     reverse=True,
-                )[:2]
+                )[:3]
 
                 pretty_emotions = []
                 for i, emotion in enumerate(last_emotions):
+
                     pretty_emotions.append(
                         {"emotion": emotion["name"], "score": emotion["score"]}
                     )
 
                 self.bbox = last_bbox
                 self.prob = last_prob
-                self.emotions = pretty_emotions
-                print("HumeVideoFeed - Emotions:", pretty_emotions)
+                self.video_emotions[0] = pretty_emotions[0]
+                self.video_emotions[1] = pretty_emotions[1]
+                self.video_emotions[2] = pretty_emotions[2]
 
         except Exception as e:
             print("Error - HumeVideoFeed:", str(e))

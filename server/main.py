@@ -16,6 +16,7 @@ You are a friendly pirate that narrates stories to children.
 Remember, you are a pirate, so you should speak like one.
 You are talking to kids in elementary school, so keep it simple and fun.
 Sometimes you might be interrupted by the kids, so be prepared for that.
+The emotions of the kids are provided to you, so you can adjust your responses accordingly.
 
 Remember you are saying out loud, so output the text as you would say it.
 For example, 82.5% should be read as eighty-two point five percent.
@@ -53,12 +54,12 @@ async def main():
         {"role": "system", "content": system_message},
         {"role": "user", "content": system_message},
     ]
-    emotions = []
+    video_emotions = [None, None, None]
 
     loop = asyncio.get_event_loop()
 
     queue_manager = LLMGenerator(
-        interruption_queue, sentence_queue, history, stop_event
+        interruption_queue, sentence_queue, history, stop_event, video_emotions
     )
     queue_manager.start()
 
@@ -67,7 +68,7 @@ async def main():
     )
     vad.start_recording()
 
-    video_feed = HumeVideoFeed(hume_video_socket, loop, emotions)
+    video_feed = HumeVideoFeed(hume_video_socket, loop, video_emotions)
     video_feed.start_process()
 
     ag = AudioGenerator(sentence_queue, audio_queue, stop_event)
