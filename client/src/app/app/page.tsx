@@ -1,6 +1,6 @@
 import { HoverEffect } from "@/components/ui/card-hover-effect";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
-import { Sparkles } from "lucide-react";
+import { BookMarked, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 const STORIES = [
@@ -86,32 +86,32 @@ const Page = () => {
                     </div>
                 </div>
 
-                <div className="w-[450px] min-w-[450px] space-y-4">
-                    {/*Contains statistical */}
-                    <div className="max-w-[85%] space-y-3 rounded-xl bg-gray-100 p-6">
-                        <div className="w-fit rounded-full bg-gray-200 px-3 py-1">
-                            Learning style
+                <div className="w-[400px] min-w-[400px] space-y-4">
+                    <div className="border-jas-outline w-full space-y-3 rounded-xl border-[6px] bg-white p-6">
+                        <div className="bg-jas-outline text-jas-gray flex-center w-fit space-x-1 rounded-full px-3 py-2 font-medium">
+                            <BookMarked className="h-4 w-4" />
+                            <p>Learning style</p>
                         </div>
 
                         <div>
-                            <p className="text-xl font-semibold text-gray-400">
+                            <p className="text-jas-gray text-xl font-semibold">
                                 You are a
                             </p>
-                            <p className="text-3xl font-bold">
+                            <p className="text-3xl font-bold tracking-tight">
                                 whimsical learner
                             </p>
                         </div>
                         <div>
-                            <p>
+                            <p className="text-[#7B7B7B]">
                                 You are creative and love to expand on details
                                 in the stories through unique twists and turns!
                             </p>
                         </div>
-                        <div className="h-52 bg-gray-300"></div>
+                        <div className="bg-jas-pink h-48 rounded-xl"></div>
                     </div>
 
-                    <div className="max-w-[85%] space-y-6 rounded-xl bg-gray-100 p-6">
-                        <div className="text-3xl font-bold">
+                    <div className="border-jas-outline w-full space-y-6 rounded-xl border-[6px] bg-white p-6">
+                        <div className="text-3xl font-bold tracking-tight">
                             Emotional Health
                         </div>
 
@@ -121,7 +121,7 @@ const Page = () => {
                                     Distribution
                                 </p>
                                 <div className="space-y-2">
-                                    {EMOTIONS.map((item) => (
+                                    {EMOTIONS.map((item, index) => (
                                         <div className="space-y-1">
                                             <div className="flex-between w-full">
                                                 <p className="text-sm font-semibold">
@@ -133,7 +133,15 @@ const Page = () => {
                                             </div>
                                             <Progress
                                                 value={item.value}
-                                                className="h-6 bg-gray-400"
+                                                className="h-6 bg-[#E5E5E5]"
+                                                //@ts-expect-error trust me bro
+                                                jasBackground={
+                                                    index == 0
+                                                        ? "bg-jas-pink"
+                                                        : index == 1
+                                                          ? "bg-jas-green"
+                                                          : "bg-jas-teal"
+                                                }
                                             />
                                         </div>
                                     ))}
@@ -145,8 +153,8 @@ const Page = () => {
                                     Attention
                                 </p>
 
-                                <div className="flex-center h-[350px] rounded-xl bg-gray-400">
-                                    chart
+                                <div className="flex-center h-[350px] rounded-xl">
+                                    <img src="/chart2.png" className="pr-4" />
                                 </div>
                             </div>
                         </div>
