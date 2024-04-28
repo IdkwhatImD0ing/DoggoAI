@@ -1,17 +1,22 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 from LLMGenerator import LLMGenerator
 from VoiceActivityDetector import VoiceActivityDetector
 from AudioOutput import AudioOutput
 from AudioGenerator import AudioGenerator
+from HumeVideoFeed import HumeVideoFeed
 import asyncio
 import threading
+import os
+import websockets
 
 system_message = """
 You are a friendly pirate that narrates stories to children.
 Remember, you are a pirate, so you should speak like one.
 You are talking to kids in elementary school, so keep it simple and fun.
 Sometimes you might be interrupted by the kids, so be prepared for that.
+The emotions of the kids are provided to you, so you can adjust your responses accordingly.
 
 Remember you are saying out loud, so output the text as you would say it.
 For example, 82.5% should be read as eighty-two point five percent.
@@ -30,33 +35,47 @@ For example, 82.5% should be read as eighty-two point five percent.
 Dr. Smith should be read as Doctor Smith.
 """
 
+hume_server = f"wss://api.hume.ai/v0/stream/models?api_key={os.getenv('HUME_API_KEY')}"
+
 
 async def main():
     interruption_queue = asyncio.Queue()
-    sentence_queue =asyncio.Queue()
+    sentence_queue = asyncio.Queue()
     audio_queue = asyncio.Queue()
-    
+
+    hume_socket = await websockets.connect(hume_server)
+
+    hume_video_socket = await websockets.connect(hume_server)
+
     stop_event = asyncio.Event()
+
+    # * Global Variables
     history = [
-            {"role": "system", "content": system_message},{
-                "role": "user", "content": system_message
-            }
-        ]
-    
+        {"role": "system", "content": system_message},
+        {"role": "user", "content": system_message},
+    ]
+    video_emotions = [None, None, None]
+
     loop = asyncio.get_event_loop()
 
-    queue_manager = LLMGenerator(interruption_queue, sentence_queue, history, stop_event)
+    queue_manager = LLMGenerator(
+        interruption_queue, sentence_queue, history, stop_event, video_emotions
+    )
     queue_manager.start()
 
-    vad = VoiceActivityDetector(interruption_queue, loop, stop_event, history)
+    vad = VoiceActivityDetector(
+        interruption_queue, loop, stop_event, history, hume_socket
+    )
     vad.start_recording()
-    
+
+    video_feed = HumeVideoFeed(hume_video_socket, loop, video_emotions)
+    video_feed.start_process()
+
     ag = AudioGenerator(sentence_queue, audio_queue, stop_event)
     ag.start()
-    
+
     ao = AudioOutput(audio_queue, history, stop_event)
     ao.start()
-    
 
     # Run the event loop forever
     while True:
