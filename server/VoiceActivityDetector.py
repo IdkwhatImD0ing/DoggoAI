@@ -14,7 +14,7 @@ class VoiceActivityDetector:
         self,
         interruption_queue,
         loop,
-        flag,
+        stop_event,
         rate=16000,
         format=pyaudio.paInt16,
         channels=1,
@@ -22,7 +22,7 @@ class VoiceActivityDetector:
         silence_threshold=200,
     ):
         self.loop = loop
-        self.flag = flag #! TODO: Implement flagging code
+        self.stop_event = stop_event #! TODO: Implement flagging code
         self.queue = interruption_queue # Interruption Queue
         self.rate = rate
         self.format = format
@@ -82,6 +82,7 @@ class VoiceActivityDetector:
                 and current_noise_level > long_term_noise_level + self.silence_threshold
             ):
                 self.voice_activity_detected = True
+                self.stop_event.set()
                 print("Listening.")
                 ambient_noise_level = long_term_noise_level
                 self.frames.extend(list(self.audio_buffer))
@@ -90,6 +91,7 @@ class VoiceActivityDetector:
                 self.frames.append(data)
                 if current_noise_level < ambient_noise_level + 100:
                     print("Stopped listening.")
+                    self.stop_event.clear()
                     self.send_voice_data(b"".join(self.frames))
                     self.frames.clear()
                     self.voice_activity_detected = False

@@ -7,11 +7,11 @@ HUME_API_KEY = os.getenv("HUME_API_KEY")
 websocket_url = f"wss://api.hume.ai/v0/evi/chat?api_key={HUME_API_KEY}"
 
 class AudioGenerator:
-    def __init__(self, sentence_queue, audio_queue, flag):
+    def __init__(self, sentence_queue, audio_queue, stop_event):
         self.sentence_queue = sentence_queue
         self.audio_queue = audio_queue
         self.websocket = None
-        self.flag = flag
+        self.stop_event = stop_event
         
     def start(self):
         loop = asyncio.get_event_loop()
@@ -20,22 +20,23 @@ class AudioGenerator:
     
     async def process_items(self):
         while True:
-            # if (not self.flag):
-            #     item = await self.sentence_queue.get()
-            # else:
-            #     self.sentence_queue = asyncio.Queue()
-            #     continue
-            item = await self.sentence_queue.get()
+            while not self.stop_event.is_set():
+                item = await self.sentence_queue.get()
+                
+                self.sentence_queue.task_done()
+                
+                try:
+                    await self.send_and_receive(item)
+                # Catch disconnect error
+                except websockets.exceptions.ConnectionClosedError:
+                    print("Websocket connection is closed.")
+                    self.websocket = await websockets.connect(websocket_url)
+                    await self.send_and_receive(item)
             
-            self.sentence_queue.task_done()
-            
-            try:
-                await self.send_and_receive(item)
-            # Catch disconnect error
-            except websockets.exceptions.ConnectionClosedError:
-                print("Websocket connection is closed.")
-                self.websocket = await websockets.connect(websocket_url)
-                await self.send_and_receive(item)
+            # Clear the queue
+            while not self.sentence_queue.empty():
+                self.sentence_queue.get_nowait()
+                self.sentence_queue.task_done()
                 
                 
     async def send_and_receive(self, sentence):

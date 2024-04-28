@@ -4,11 +4,12 @@ from utils import text_chunker
 
 
 class LLMGenerator:
-    def __init__(self, interruption_queue, sentence_queue, history):
+    def __init__(self, interruption_queue, sentence_queue, history, stop_event):
         self.interruption_queue = interruption_queue
         self.sentence_queue = sentence_queue
         self.client = AsyncOpenAI()
         self.history = history
+        self.stop_event = stop_event
         
     def start(self):
         loop = asyncio.get_event_loop()
@@ -16,14 +17,20 @@ class LLMGenerator:
 
     async def process_items(self):
         while True:
-            item = await self.interruption_queue.get()
+            while not self.stop_event.is_set():
+                item = await self.interruption_queue.get()
 
-            # Cancel the current task if it is running
-            self.history.append({"role": "user", "content": item})
+                # Cancel the current task if it is running
+                self.history.append({"role": "user", "content": item})
 
-            # Start a new task for processing the item
-            self.current_task = asyncio.create_task(self.process_llm(item))
-            self.interruption_queue.task_done()
+                # Start a new task for processing the item
+                self.current_task = asyncio.create_task(self.process_llm(item))
+                self.interruption_queue.task_done()
+            
+            # Clear the queue
+            while not self.interruption_queue.empty():
+                self.interruption_queue.get_nowait()
+                self.interruption_queue.task_done()
 
     async def process_llm(self, text):
         print("Current history:", self.history)
