@@ -1,47 +1,5 @@
-import { HoverEffect } from "@/components/ui/card-hover-effect";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
-import { BookMarked, Pause, Sparkles, StopCircle } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { Pause, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const STORIES = [
-    {
-        id: 1,
-        title: "Cows in the field",
-        tags: ["animals", "grazing"],
-        background: "bg-jas-pink",
-        link: "k3v.in",
-    },
-    {
-        id: 2,
-        title: "Riding horses",
-        tags: ["animals", "grazing"],
-        background: "bg-jas-green",
-        link: "k3v.in",
-    },
-    {
-        id: 3,
-        title: "Pigs in the barn",
-        tags: ["animals", "grazing"],
-        background: "bg-jas-purple",
-        link: "k3v.in",
-    },
-];
-
-const EMOTIONS = [
-    {
-        emotion: "joy",
-        value: 86,
-    },
-    {
-        emotion: "concentration",
-        value: 76,
-    },
-    {
-        emotion: "confusion",
-        value: 12,
-    },
-];
 
 const Page = () => {
     return (
