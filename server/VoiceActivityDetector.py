@@ -29,6 +29,7 @@ class VoiceActivityDetector:
         self.channels = channels
         self.chunk_size = chunk_size
         self.silence_threshold = silence_threshold
+        self.count = 0
 
         self.audio = pyaudio.PyAudio()
         self.stream = self.audio.open(
@@ -112,6 +113,11 @@ class VoiceActivityDetector:
                 wf.setframerate(self.rate)
                 wf.writeframes(audio_data)
             wav_data = wav_buffer.getvalue()
+            
+            # Save to file
+            # with open(f"input{self.count}.wav", "wb") as f:
+            #     self.count +=1
+            #     f.write(wav_data)
             audio_stream = io.BytesIO(wav_data)
             audio_stream.name = "audio.wav"
             transcript = await self.client.audio.transcriptions.create(

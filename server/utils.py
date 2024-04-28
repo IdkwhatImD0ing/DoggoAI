@@ -5,9 +5,14 @@ async def text_chunker(chunks):
 
     async for text in chunks:
         message = text.choices[0].delta.content
-        if message == None:
+        if text.choices[0].finish_reason != None:
+            print("\n")
+            # If there's any remaining text in the buffer after the loop, yield it
+            if buffer:
+                yield buffer
             yield None
             break
+        
         buffer += message
 
         # Find the last occurrence of any sentence-ending punctuation in the buffer
@@ -21,6 +26,4 @@ async def text_chunker(chunks):
                 last_punct + 1 :
             ].strip()  # Save what's after the punctuation into the buffer
 
-    # If there's any remaining text in the buffer after the loop, yield it
-    if buffer:
-        yield buffer
+

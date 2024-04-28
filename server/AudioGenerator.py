@@ -49,17 +49,14 @@ class AudioGenerator:
             if stop_task in done:
                 print("AudioGenerator - Stop event was triggered.")
                 # Clear the queue
-                print("AudioGenerator - Clearing the sentence queue.")
                 while not self.sentence_queue.empty():
+                    print("AudioGenerator - Clearing the sentence queue.")
                     self.sentence_queue.get_nowait()
                     self.sentence_queue.task_done()
-                continue
             
             for task in pending:
                 task.cancel()
             
-            
-                
     async def send_and_receive(self, sentence):
         
         if self.stop_event.is_set():
@@ -69,7 +66,7 @@ class AudioGenerator:
         if sentence == None:
             await self.audio_queue.put(None)
             return
-        
+
         await self.websocket.send(
             json.dumps(
                 {"type": "assistant_input", "text": sentence}
