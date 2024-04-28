@@ -38,6 +38,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: Optional[str] = No
         while True:
             data = await websocket.receive_json()
             event = data["event"]
+            print(f"Event: {event}")
+            if event == "upload_transcript":
+                message = {event: "display_transcript", "data": data["transcript"]}
+                await manager.broadcast(message)
     except WebSocketDisconnect:
         print("Disconnecting...")
         await manager.disconnect(client_id)
