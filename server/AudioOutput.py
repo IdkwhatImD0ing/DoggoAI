@@ -30,15 +30,13 @@ class AudioOutput:
         while True:
             try:
                 while self.stop_event.is_set():
-                    print("AudioOutput - Waiting for stop event to clear.")
                     # Clear the queue
                     while not self.audio_queue.empty():
-                        print("AudioOutput - Clearing the audio queue.")
                         self.audio_queue.get_nowait()
                         self.audio_queue.task_done()
                         
                     if self.text != "":
-                        self.history += [{"role": "assistant", "content": self.text + "User Interrupted"}]
+                        self.history += [{"role": "assistant", "content": self.text + " User Interrupted"}]
                         self.text = ""
                     await asyncio.sleep(1)
                     
@@ -82,7 +80,7 @@ class AudioOutput:
                                 self.audio_queue.task_done()
                                 
                             if self.text != "":
-                                self.history += [{"role": "assistant", "content": self.text + "User Interrupted"}]
+                                self.history += [{"role": "assistant", "content": self.text + " User Interrupted"}]
                                 self.text = ""
                                 
                             break
@@ -102,7 +100,7 @@ class AudioOutput:
                         self.audio_queue.task_done()
                         
                     if self.text != "":
-                        self.history += [{"role": "assistant", "content": self.text + "User Interrupted"}]
+                        self.history += [{"role": "assistant", "content": self.text + " User Interrupted"}]
                         self.text = ""
                         
                 

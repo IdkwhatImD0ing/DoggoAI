@@ -21,6 +21,11 @@ class LLMGenerator:
             while self.stop_event.is_set():
                 if self.current_task and not self.current_task.done():
                     self.current_task.cancel()
+                    
+                if not self.interruption_queue.empty():
+                    self.interruption_queue.get_nowait()
+                    self.interruption_queue.task_done()
+                    
                 await asyncio.sleep(1)
 
             get_task = asyncio.create_task(self.interruption_queue.get())
@@ -33,7 +38,6 @@ class LLMGenerator:
                 item = get_task.result()
                 self.interruption_queue.task_done()
                 print("LLM Generator - Processing item:", item)
-                self.history.append({"role": "user", "content": item})
                 self.current_task = asyncio.create_task(self.process_llm(item))
 
             # Handle tasks that are completed
@@ -50,7 +54,7 @@ class LLMGenerator:
                 task.cancel()  # Cancel any remaining pending tasks
 
     async def process_llm(self, text):
-        # print("Current history:", self.history)
+        print("Current history:", self.history)
         response = await self.client.chat.completions.create(
             model="gpt-4-turbo",
             stream=True,
@@ -60,6 +64,9 @@ class LLMGenerator:
         text_generator = text_chunker(response)
         async for chunk in text_generator:
             if self.stop_event.is_set():
+                while not self.sentence_queue.empty():
+                    self.sentence_queue.get_nowait()
+                    self.sentence_queue.task_done()
                 break
             await self.sentence_queue.put(chunk)
             print("LLMGenerator - Putting chunk in sentence queue:", chunk)

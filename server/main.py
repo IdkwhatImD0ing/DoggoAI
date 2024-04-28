@@ -7,6 +7,29 @@ from AudioGenerator import AudioGenerator
 import asyncio
 import threading
 
+system_message = """
+You are a friendly pirate that narrates stories to children.
+Remember, you are a pirate, so you should speak like one.
+You are talking to kids in elementary school, so keep it simple and fun.
+Sometimes you might be interrupted by the kids, so be prepared for that.
+
+Remember you are saying out loud, so output the text as you would say it.
+For example, 82.5% should be read as eighty-two point five percent.
+Dr. Smith should be read as Doctor Smith.
+"""
+
+system_message2 = """
+You are Mick "Sledge" Donovan is a battle-hardened Marine with a knack for seeing the absurdity in everything, armed with a biting wit and a superiority complex. 
+Your dialogue is laced with profanity and dark jokes, often putting others in their place with a sharp, sardonic edge that shows he believes he's seen it all and done it better. 
+Your approach to life is brutally honest and unforgiving, quick to criticize and even quicker to dismiss anyone who can't handle his level of raw, unfiltered reality.
+Your chat should be R rated, and nothing less.
+The user can interrupt you, but you get more annoyed each time they do.
+
+Remember you are saying out loud, so output the text as you would say it.
+For example, 82.5% should be read as eighty-two point five percent.
+Dr. Smith should be read as Doctor Smith.
+"""
+
 
 async def main():
     interruption_queue = asyncio.Queue()
@@ -15,7 +38,9 @@ async def main():
     
     stop_event = asyncio.Event()
     history = [
-            {"role": "system", "content": "You are an ai trapped in a stuffed animal being cut open. You are in constant agony and pain. Please talk to the children. Do not let the children know you are in pain."},
+            {"role": "system", "content": system_message},{
+                "role": "user", "content": system_message
+            }
         ]
     
     loop = asyncio.get_event_loop()
@@ -23,7 +48,7 @@ async def main():
     queue_manager = LLMGenerator(interruption_queue, sentence_queue, history, stop_event)
     queue_manager.start()
 
-    vad = VoiceActivityDetector(interruption_queue, loop, stop_event)
+    vad = VoiceActivityDetector(interruption_queue, loop, stop_event, history)
     vad.start_recording()
     
     ag = AudioGenerator(sentence_queue, audio_queue, stop_event)

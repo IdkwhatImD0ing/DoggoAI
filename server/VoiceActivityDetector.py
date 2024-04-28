@@ -15,6 +15,7 @@ class VoiceActivityDetector:
         interruption_queue,
         loop,
         stop_event,
+        history,
         rate=16000,
         format=pyaudio.paInt16,
         channels=1,
@@ -23,6 +24,7 @@ class VoiceActivityDetector:
     ):
         self.loop = loop
         self.stop_event = stop_event #! TODO: Implement flagging code
+        self.history = history
         self.interruption_queue = interruption_queue # Interruption Queue
         self.rate = rate
         self.format = format
@@ -124,6 +126,7 @@ class VoiceActivityDetector:
                 model="whisper-1", file=audio_stream, response_format="text", language="en"
             )
             await self.interruption_queue.put(transcript)
+            self.history.append({"role": "user", "content": transcript})
             print("VoiceActivityDetector - Added to queue:", transcript)
 
         except Exception as e:

@@ -50,7 +50,6 @@ class AudioGenerator:
                 print("AudioGenerator - Stop event was triggered.")
                 # Clear the queue
                 while not self.sentence_queue.empty():
-                    print("AudioGenerator - Clearing the sentence queue.")
                     self.sentence_queue.get_nowait()
                     self.sentence_queue.task_done()
             
@@ -102,7 +101,6 @@ class AudioGenerator:
         
     def clear_queue(self):
         while not self.sentence_queue.empty():
-            print("AudioGenerator - Clearing the sentence queue.")
             self.sentence_queue.get_nowait()
             self.sentence_queue.task_done()
         
