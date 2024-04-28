@@ -39,14 +39,17 @@ async def websocket_endpoint(websocket: WebSocket, client_id: Optional[str] = No
             data = await websocket.receive_json()
             event = data["event"]
             print(f"Event: {event}")
-            if event == "upload_transcript":
-                message = {event: "display_transcript", "data": data["transcript"]}
+            if event == "user":
+                message = {event: "display_user_message", "transcript": data["transcript"], "audio_emotions": data["audio_emotions"]}
                 await manager.broadcast(message)
-            elif event == "upload_emotions":
-                message = {event: "display_emotions", "data": data["emotions"]}
+            elif event == "assistant":
+                message = {event: "display_assistant_message", "content": data["content"]}
                 await manager.broadcast(message)
-            elif event == "upload_frame":
-                message = {event: "display_frame", "data": data["frame"]}
+            elif event == "video_emotions":
+                message = {event: "display_video_emotions", "emotions": data["emotions"]}
+                await manager.broadcast(message)
+            elif event == "video":
+                message = {event: "display_video", "data": data["data"]}
                 await manager.broadcast(message)
     except WebSocketDisconnect:
         print("Disconnecting...")
