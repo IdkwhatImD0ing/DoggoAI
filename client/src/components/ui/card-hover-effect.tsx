@@ -61,7 +61,7 @@ export const HoverEffect = ({
                                       : "/pig.png"
                             }
                             className={cn(
-                                "h-36 w-full bg-gray-400",
+                                "h-36 w-full bg-gray-400 object-contain",
                                 item?.background,
                             )}
                         />
