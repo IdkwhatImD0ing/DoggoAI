@@ -1,53 +1,53 @@
-import { HoverEffect } from "@/components/ui/card-hover-effect";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
-import { Sparkles } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import {
+    BookCopy,
+    Dog,
+    Pencil,
+    Plus,
+    Search,
+    TreeDeciduous,
+} from "lucide-react";
 
-const STORIES = [
+const TOPICS = [
     {
         id: 1,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
-        link: "k3v.in",
+        icon: BookCopy,
+        title: "all",
     },
     {
         id: 2,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
-        link: "k3v.in",
+        icon: Dog,
+        title: "animals",
     },
     {
         id: 3,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
-        link: "k3v.in",
+        icon: TreeDeciduous,
+        title: "places",
     },
     {
         id: 4,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
-        link: "k3v.in",
+        icon: Pencil,
+        title: "things",
     },
     {
         id: 5,
-        title: "Cows in the field",
-        tags: ["wallah", "inshallah"],
-        link: "k3v.in",
+        icon: Pencil,
+        title: "things",
     },
 ];
 
-const EMOTIONS = [
+const GIFTS = [
     {
-        emotion: "joy",
-        value: 86,
+        title: "Send a gift",
+        description: "send a surprise gift to a random hospital patient!",
     },
     {
-        emotion: "concentration",
-        value: 76,
+        title: "Donate care package",
+        description: "fund a gift for a stranger!",
     },
     {
-        emotion: "confusion",
-        value: 12,
+        title: "Write a card",
+        description: "Send a get well card to a hospital patient!",
     },
 ];
 
@@ -62,37 +62,42 @@ const Page = () => {
 
             <div className="flex flex-row space-x-12 pt-8">
                 <div className="max-h-fit w-full space-y-4">
-                    {/* <div className="flex-between rounded-lg border-4 border-dashed border-gray-400 bg-gray-400 bg-clip-padding p-6">
-                        <div className="flex h-full flex-col justify-between space-y-12 pt-4">
-                            <h3 className="text-4xl font-bold">
-                                Create a new story!
-                            </h3>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 w-5 -translate-y-1/2 transform" />
+                        <Input
+                            className="h-12 rounded-full bg-gray-200 pl-10"
+                            placeholder="search"
+                        />
+                    </div>
 
-                            <HoverBorderGradient
-                                className="flex-center w-60 space-x-2 py-4 text-2xl"
-                                duration={0.1}
-                            >
-                                <Sparkles /> <p>make magic</p>
-                            </HoverBorderGradient>
+                    <div className="space-y-4 rounded-xl bg-gray-200 p-6">
+                        <p className="text-2xl font-bold">Select a topic</p>
+
+                        <div className="flex flex-row space-x-4 overflow-auto">
+                            {TOPICS.map((topic) => (
+                                <div
+                                    className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400"
+                                    key={topic.id}
+                                >
+                                    <div className="flex-center h-24 w-24 rounded-xl bg-gray-400 group-hover:bg-gray-900">
+                                        <topic.icon className="h-12 w-12 group-hover:text-white" />
+                                    </div>
+                                    <p className="text-xl font-bold">
+                                        {topic.title}
+                                    </p>
+                                </div>
+                            ))}
+                            <div className="flex-center group h-40 w-32 min-w-32 flex-col space-y-2 rounded-xl bg-gray-300 hover:bg-gray-400">
+                                <div className="flex-center h-24 w-24 rounded-xl border-4 border-dotted">
+                                    <Plus className="h-12 w-12 group-hover:text-white" />
+                                </div>
+                                <p className="text-xl font-bold">See more...</p>
+                            </div>
                         </div>
-                        <img src="/bear.svg" />
                     </div>
-
-                    <div className="space-y-2 rounded-xl bg-gray-100 p-6">
-                        <h4 className="px-2 text-2xl font-bold">
-                            Your Stories
-                        </h4>
-                        <HoverEffect items={STORIES} className="py-0" />
-                    </div>
-
-                    <div className="space-y-2 rounded-xl bg-gray-100 p-6">
-                        <h4 className="px-2 text-2xl font-bold">Your Words</h4>
-                        <HoverEffect items={STORIES} className="py-0" />
-                    </div> */}
                 </div>
 
                 <div className="w-[450px] min-w-[450px] space-y-4">
-                    {/*Contains statistical */}
                     <div className="max-w-[85%] space-y-6 rounded-xl bg-gray-100 p-6">
                         <div className="space-y-3">
                             <div className="w-fit rounded-full bg-gray-200 px-3 py-1">
@@ -116,44 +121,37 @@ const Page = () => {
                     </div>
 
                     <div className="max-w-[85%] space-y-6 rounded-xl bg-gray-100 p-6">
-                        <div className="text-3xl font-bold">
-                            Emotional Health
+                        <div className="space-y-2">
+                            <div className="w-fit rounded-full bg-gray-200 px-3 py-1">
+                                Social impact
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-3xl font-bold">
+                                    Send Kindness
+                                </p>
+                                <p>
+                                    Use your tokens to propel change and create
+                                    a random act of kindness!
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="space-y-12">
-                            <div className="space-y-4">
-                                <p className="text-lg font-semibold">
-                                    Distribution
-                                </p>
-                                <div className="space-y-2">
-                                    {EMOTIONS.map((item) => (
-                                        <div className="space-y-1">
-                                            <div className="flex-between w-full">
-                                                <p className="text-sm font-semibold">
-                                                    {item.emotion}
-                                                </p>
-                                                <p className="text-sm font-semibold opacity-40">
-                                                    {item.value}%
-                                                </p>
-                                            </div>
-                                            <Progress
-                                                value={item.value}
-                                                className="h-6 bg-gray-400"
-                                            />
-                                        </div>
-                                    ))}
+                        <div className="flex flex-col space-y-4">
+                            {GIFTS.map((item) => (
+                                <div className="flex flex-row space-x-4 rounded-xl bg-white p-4">
+                                    <div className="h-20 w-20 min-w-20 rounded-xl bg-gray-400">
+                                        <img className="object-cover" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-2xl font-bold">
+                                            {item.title}
+                                        </p>
+                                        <p className="leading-snug">
+                                            {item.description}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <p className="text-lg font-semibold">
-                                    Attention
-                                </p>
-
-                                <div className="flex-center h-[350px] rounded-xl bg-gray-400">
-                                    chart
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </div>
