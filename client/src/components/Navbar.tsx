@@ -28,20 +28,27 @@ const Navbar = () => {
     const pathname = usePathname();
 
     return (
-        <div className="min-h-full w-[100px] bg-gray-500 py-16">
-            <div className="mx-auto space-y-4">
+        <div className="fixed max-h-[calc(100vh-2rem)] min-h-[calc(100vh-2rem)] w-[100px] rounded-3xl bg-white p-4 py-6">
+            <div className="mx-auto space-y-3">
                 {LINKS.map((item) => (
                     <div
                         key={item.id}
                         className={cn(
-                            "flex-center mx-auto aspect-square w-16 cursor-pointer",
+                            "flex-center mx-auto aspect-square w-16 cursor-pointer rounded-full",
                             pathname.includes(item.link)
-                                ? "bg-gray-800"
-                                : "bg-gray-400",
+                                ? "bg-jas-blue"
+                                : "bg-[#E9F4F7]",
                         )}
                         onClick={() => router.push(item.link)}
                     >
-                        <item.icon className="text-white" />
+                        <item.icon
+                            className={cn(
+                                "h-7 w-7 stroke-[3]",
+                                pathname.includes(item.link)
+                                    ? "text-white"
+                                    : "text-jas-gray",
+                            )}
+                        />
                     </div>
                 ))}
             </div>
