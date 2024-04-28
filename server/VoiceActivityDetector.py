@@ -146,7 +146,7 @@ class VoiceActivityDetector:
             transcript, audio_emotions = await asyncio.gather(
                 transcript_task, audio_task
             )
-            print("VoiceActivityDetector - Emotions:", audio_emotions)
+            # print("VoiceActivityDetector - Emotions:", audio_emotions)
 
             # TODO: pass audio and video to GPT
             emotional_context_transcript = {

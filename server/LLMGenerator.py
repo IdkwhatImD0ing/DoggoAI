@@ -53,7 +53,7 @@ class LLMGenerator:
                         )
 
                 emotions = result["audio_emotions"] + "\n" + formatted_emotions
-                print("LLMGenerator - Emotions:", emotions)
+                # print("LLMGenerator - Emotions:", emotions)
                 self.current_task = asyncio.create_task(
                     self.process_llm(item, emotions)
                 )
