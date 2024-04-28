@@ -60,6 +60,7 @@ class AudioGenerator:
     async def send_and_receive(self, sentence):
         
         if self.stop_event.is_set():
+            self.clear_queue()
             print("AudioGenerator - Stop event was triggered.")
             return
         
@@ -74,6 +75,7 @@ class AudioGenerator:
         )
         
         if self.stop_event.is_set():
+            self.clear_queue()
             print("AudioGenerator - Stop event was triggered.")
             return
         
@@ -81,6 +83,11 @@ class AudioGenerator:
             data = json.loads(await self.websocket.recv())
             if "data" in data:
                 break
+        
+        if self.stop_event.is_set():
+            self.clear_queue()
+            print("AudioGenerator - Stop event was triggered.")
+            return
         
         await self.audio_queue.put({
             "text": sentence,
@@ -92,4 +99,10 @@ class AudioGenerator:
     async def connect_websocket(self):
         print("Connecting to websocket...")
         self.websocket = await websockets.connect(websocket_url)
+        
+    def clear_queue(self):
+        while not self.sentence_queue.empty():
+            print("AudioGenerator - Clearing the sentence queue.")
+            self.sentence_queue.get_nowait()
+            self.sentence_queue.task_done()
         
