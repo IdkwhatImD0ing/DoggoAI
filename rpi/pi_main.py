@@ -13,16 +13,18 @@ import websockets
 
 
 hume_server = f"wss://api.hume.ai/v0/stream/models?api_key={os.getenv('HUME_API_KEY')}"
-server_url = "ws://localhost:8000"  # TODO: Replace with ngrok URL
+server_url = (
+    "wss://58b7a26b7325.ngrok.app/ws?client_id=1234"  # TODO: Replace with ngrok URL
+)
 
 system_message = """
-You are a friendly pirate that narrates stories to children.
-Remember, you are a pirate, so you should speak like one.
-You are talking to kids in elementary school, so keep it simple and fun.
-Sometimes you might be interrupted by the kids, so be prepared for that.
-The emotions of the kids are provided to you, so you can adjust your responses accordingly.
+You are a cuddly stuffed dog plushy that tells delightful stories to children.
+Remember, you are soft and friendly, so your tone should be warm and comforting.
+You are talking to kids in elementary school, so keep your language simple and engaging.
+Sometimes the kids might interrupt you with questions or comments, so be ready to pause and interact.
+The emotions of the kids are provided to you, so you can adjust your storytelling to be more engaging or soothing as needed.
 
-Remember you are saying out loud, so output the text as you would say it.
+Remember you are speaking out loud, so output the text as you would say it.
 For example, 82.5% should be read as eighty-two point five percent.
 Dr. Smith should be read as Doctor Smith.
 """
@@ -49,7 +51,14 @@ async def main():
 
     hume_video_socket = await websockets.connect(hume_server)
 
-    server_socket = await websockets.connect(server_url)
+    async def send_data(data):
+        # try:
+        server_socket = await websockets.connect(server_url)
+        await server_socket.send(data)
+        # except Exception as e:
+        #     server_socket = await websockets.connect(server_url)
+        #     await server_socket.send(data)
+        #     print("Error - Main:", str(e))
 
     stop_event = asyncio.Event()
 
@@ -59,26 +68,29 @@ async def main():
         {"role": "user", "content": system_message},
     ]
     video_emotions = [None, None, None]
+    images = [None]
 
     loop = asyncio.get_event_loop()
 
     queue_manager = LLMGenerator(
-        interruption_queue, sentence_queue, history, stop_event, video_emotions
+        interruption_queue, sentence_queue, history, stop_event, video_emotions, images
     )
     queue_manager.start()
 
     vad = VoiceActivityDetector(
-        interruption_queue, loop, stop_event, history, hume_socket, server_socket
+        interruption_queue, loop, stop_event, history, hume_socket, send_data
     )
     vad.start_recording()
 
-    video_feed = HumeVideoFeed(hume_video_socket, loop, video_emotions, server_socket)
+    video_feed = HumeVideoFeed(
+        hume_video_socket, loop, video_emotions, send_data, images
+    )
     video_feed.start_process()
 
     ag = AudioGenerator(sentence_queue, audio_queue, stop_event)
     ag.start()
 
-    ao = AudioOutput(audio_queue, history, stop_event, server_socket)
+    ao = AudioOutput(audio_queue, history, stop_event, send_data)
     ao.start()
 
     # Run the event loop forever

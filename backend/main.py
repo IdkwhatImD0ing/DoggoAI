@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+
 load_dotenv()  # take environment variables from .env.
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,12 +21,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+
+events = 0
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, client_id: Optional[str] = None):
+    global events
+
     if client_id is None:
         client_id = websocket.query_params.get("client_id")
 
@@ -33,26 +41,40 @@ async def websocket_endpoint(websocket: WebSocket, client_id: Optional[str] = No
         await websocket.close(code=4001)
         return
     # save this client into server memory
-    await manager.connect(websocket, client_id)  
+    await manager.connect(websocket, client_id)
     try:
         while True:
             data = await websocket.receive_json()
             event = data["event"]
-            print(f"Event: {event}")
+            print(f"Event: {event}, number of events: {events}")
+            events += 1
             if event == "user":
-                message = {event: "display_user_message", "transcript": data["transcript"], "audio_emotions": data["audio_emotions"]}
+                message = {
+                    event: "display_user_message",
+                    "transcript": data["transcript"],
+                    "audio_emotions": data["audio_emotions"],
+                }
                 await manager.broadcast(message)
             elif event == "assistant":
-                message = {event: "display_assistant_message", "content": data["content"]}
+                message = {
+                    event: "display_assistant_message",
+                    "content": data["content"],
+                }
                 await manager.broadcast(message)
             elif event == "video_emotions":
-                message = {event: "display_video_emotions", "emotions": data["emotions"]}
+                message = {
+                    event: "display_video_emotions",
+                    "emotions": data["emotions"],
+                }
                 await manager.broadcast(message)
             elif event == "video":
                 message = {event: "display_video", "data": data["data"]}
                 await manager.broadcast(message)
     except WebSocketDisconnect:
-        print("Disconnecting...")
+        print("Disconnecting...", client_id)
+        await manager.disconnect(client_id)
+    except Exception as e:
+        print("Error:", str(e))
         await manager.disconnect(client_id)
 
 

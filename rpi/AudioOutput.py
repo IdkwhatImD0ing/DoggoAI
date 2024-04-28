@@ -7,11 +7,12 @@ import json
 
 
 class AudioOutput:
-    def __init__(self, audio_queue, history, stop_event, server_socket):
+
+    def __init__(self, audio_queue, history, stop_event, send_data):
         self.audio_queue = audio_queue
         self.history = history
         self.websocket = None
-        self.server_socket = server_socket
+        self.send_data = send_data
         self.flag = False
         self.text = ""
         self.stop_event = stop_event
@@ -65,7 +66,9 @@ class AudioOutput:
 
                     audio = base64.b64decode(data["audio"])
                     message = data["text"]
-
+                    await self.send_data(
+                        json.dumps({"event": "assistant", "content": message})
+                    )
                     audio_segment = AudioSegment.from_file(BytesIO(audio))
 
                     # Save the audio to a file
@@ -80,9 +83,7 @@ class AudioOutput:
                     )  # Calculate frame count for 0.1 seconds
                     total_frames = len(audio_segment.get_array_of_samples())
                     print("AudioOutput - Playing audio:", message)
-                    await self.server_socket.send(
-                        json.dumps({"event": "assistant", "content": message})
-                    )
+
                     for i in range(0, total_frames, frame_count):
                         if self.stop_event.is_set():
                             print("AudioOutput - Stop Triggered")

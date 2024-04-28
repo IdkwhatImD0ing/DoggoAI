@@ -5,13 +5,21 @@ from utils import text_chunker
 
 class LLMGenerator:
     def __init__(
-        self, interruption_queue, sentence_queue, history, stop_event, video_emotions
+        self,
+        interruption_queue,
+        sentence_queue,
+        history,
+        stop_event,
+        video_emotions,
+        images,
     ):
         self.interruption_queue = interruption_queue
         self.sentence_queue = sentence_queue
         self.client = AsyncOpenAI()
         self.history = history
         self.stop_event = stop_event  # asyncio.event
+        print(images)
+        self.images = images
         self.current_task = None
         # audio_emotions are put into the interruption_queue
         self.video_emotions = video_emotions
@@ -72,12 +80,31 @@ class LLMGenerator:
                 task.cancel()  # Cancel any remaining pending tasks
 
     async def process_llm(self, text, emotions):
-        response = await self.client.chat.completions.create(
-            model="gpt-4-turbo",
-            stream=True,
-            max_tokens=500,
-            messages=self.history + [{"role": "user", "content": text + emotions}],
-        )
+        try:
+            response = await self.client.chat.completions.create(
+                model="gpt-4-turbo",
+                stream=True,
+                max_tokens=500,
+                messages=self.history
+                + [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": text + emotions},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/jpeg;base64,{self.images[0]}"
+                                },
+                            },
+                        ],
+                    },
+                ],
+            )
+        except Exception as e:
+            print("Error in process_llm:", str(e))
+
+        print(response)
         text_generator = text_chunker(response)
         async for chunk in text_generator:
             if self.stop_event.is_set():

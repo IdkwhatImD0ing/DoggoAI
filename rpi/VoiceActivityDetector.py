@@ -12,6 +12,7 @@ import json
 
 
 class VoiceActivityDetector:
+
     def __init__(
         self,
         interruption_queue,
@@ -19,7 +20,7 @@ class VoiceActivityDetector:
         stop_event,
         history,
         hume_socket,
-        server_socket,
+        send_data,
         rate=16000,
         format=pyaudio.paInt16,
         channels=1,
@@ -30,7 +31,7 @@ class VoiceActivityDetector:
         self.stop_event = stop_event
         self.history = history
         self.hume_socket = hume_socket
-        self.server_socket = server_socket
+        self.send_data = send_data
         self.interruption_queue = interruption_queue  # Interruption Queue
         self.rate = rate
         self.format = format
@@ -130,8 +131,8 @@ class VoiceActivityDetector:
             audio_stream.name = "audio.wav"
 
             # Save as wav file
-            with open("audio.wav", "wb") as f:
-                f.write(wav_data)
+            # with open("audio.wav", "wb") as f:
+            #     f.write(wav_data)
 
             transcript_task = self.client.audio.transcriptions.create(
                 model="whisper-1",
@@ -156,13 +157,15 @@ class VoiceActivityDetector:
                 "transcript": transcript,
                 "audio_emotions": audio_emotions,
             }
-
-            await self.server_socket.send(json.dumps(emotion_context))
+            try:
+                await self.send_data(json.dumps(emotion_context))
+            except Exception as e:
+                print("Failed to send to server:", str(e))
 
             pretty_emotions = "Voice Emotions:\n"
             for i, emotion in enumerate(audio_emotions):
                 pretty_emotions += (
-                    f"Emotion {i + 1}: {emotion['name']} ({emotion['score']:.2%})\n"
+                    f"Emotion {i + 1}: {emotion['emotion']} ({emotion['score']:.2%})\n"
                 )
 
             emotion_context = {

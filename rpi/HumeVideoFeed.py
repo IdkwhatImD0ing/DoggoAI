@@ -13,13 +13,15 @@ dotenv.load_dotenv()
 
 
 class HumeVideoFeed:
-    def __init__(self, socket, loop, video_emotions, server_socket):
+    def __init__(self, socket, loop, video_emotions, send_data, images):
         self.socket = socket
-        self.server_socket = server_socket
+        self.send_data = send_data
+        self.images = images
         self.loop = loop
         self.bbox = {"x": 0, "y": 0, "w": 0, "h": 0}
         self.prob = 0.0
         self.video_emotions = video_emotions
+        self.count = 0
 
     def start_process(self):
         self.thread = threading.Thread(target=self.process_video)
@@ -27,7 +29,6 @@ class HumeVideoFeed:
 
     def stop_process(self):
         self.thread.join()
-        self.thread2.join()
 
     def process_video(self):
         cap = cv2.VideoCapture(0)
@@ -36,60 +37,63 @@ class HumeVideoFeed:
         if not cap.isOpened():
             print("Cannot open camera")
             return
+        try:
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    print("Can't receive frame (stream end?). Exiting ...")
+                    break
 
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                print("Can't receive frame (stream end?). Exiting ...")
-                break
-            if time.time() - prev_time > interval:
-                prev_time = time.time()
-                asyncio.run_coroutine_threadsafe(self.process_hume(frame), self.loop)
+                if time.time() - prev_time > interval:
+                    # Save the frame to an image
+                    prev_time = time.time()
 
-            # NOTE: Debug Purposes
-            # Write bbox, prob, and emotions to the image
-            x, y, w, h = (
-                int(self.bbox["x"]),
-                int(self.bbox["y"]),
-                int(self.bbox["w"]),
-                int(self.bbox["h"]),
-            )
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(
-                frame,
-                f"Prob: {self.prob:.2f}",
-                (x, y - 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.9,
-                (0, 255, 0),
-                2,
-            )
-            for i, emotion in enumerate(self.video_emotions):
-                if emotion:
-                    text = f"{emotion['emotion']}: {emotion['score']:.2f}"
-                    cv2.putText(
-                        frame,
-                        text,
-                        (10, 30 * (i + 1)),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.9,
-                        (255, 255, 255),
-                        2,
+                    frame_base64 = base64.b64encode(
+                        cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 50])[1]
+                    ).decode()
+
+                    asyncio.run_coroutine_threadsafe(
+                        self.process_hume(frame_base64), self.loop
                     )
 
-            # Convert frame to base64 image, and also send to server
-            frame_base64 = base64.b64encode(cv2.imencode(".jpg", frame)[1]).decode()
-            data = {
-                "event": "video",
-                "data": frame_base64,
-            }
-            asyncio.run_coroutine_threadsafe(
-                self.server_socket.send(json.dumps(data)), self.loop
-            )
+                    # NOTE: Debug Purposes
+                    # Write bbox, prob, and emotions to the image
+                    x, y, w, h = (
+                        int(self.bbox["x"]),
+                        int(self.bbox["y"]),
+                        int(self.bbox["w"]),
+                        int(self.bbox["h"]),
+                    )
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-    async def process_hume(self, frame):
+                    frame_base64 = base64.b64encode(
+                        cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 50])[1]
+                    ).decode()
+
+                    # Convert frame to base64 image, and also send to server
+                    data = {
+                        "event": "video",
+                        "data": frame_base64,
+                    }
+                    self.images[0] = frame_base64
+                    print("HumeVideoFeed - Sent to server:", self.count)
+                    self.count += 1
+                    asyncio.run_coroutine_threadsafe(self.send_video(data), self.loop)
+
+        except Exception as e:
+            print("Error - HumeVideoFeed:", str(e))
+
+    async def send_video(self, data):
         try:
-            frame_base64 = base64.b64encode(cv2.imencode(".jpg", frame)[1]).decode()
+            await self.send_data(json.dumps(data))
+            print("HumeVideoFeed - Sent to server:", self.count)
+            self.count += 1
+        except Exception as e:
+            print("Error - HumeVideoFeed:", str(e))
+
+    async def process_hume(self, frame_base64):
+        try:
+
             data = {"data": frame_base64, "models": {"face": {}}}
             await self.socket.send(json.dumps(data))
             result = await self.socket.recv()
@@ -119,7 +123,7 @@ class HumeVideoFeed:
                 self.video_emotions[1] = pretty_emotions[1]
                 self.video_emotions[2] = pretty_emotions[2]
 
-                await self.server_socket.send(
+                await self.send_data(
                     json.dumps(
                         {
                             "event": "video_emotions",
