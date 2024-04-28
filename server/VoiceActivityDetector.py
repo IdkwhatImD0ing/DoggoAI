@@ -23,7 +23,7 @@ class VoiceActivityDetector:
     ):
         self.loop = loop
         self.stop_event = stop_event #! TODO: Implement flagging code
-        self.queue = interruption_queue # Interruption Queue
+        self.interruption_queue = interruption_queue # Interruption Queue
         self.rate = rate
         self.format = format
         self.channels = channels
@@ -82,8 +82,8 @@ class VoiceActivityDetector:
                 and current_noise_level > long_term_noise_level + self.silence_threshold
             ):
                 self.voice_activity_detected = True
-                self.stop_event.set()
                 print("Listening.")
+                self.stop_event.set()
                 ambient_noise_level = long_term_noise_level
                 self.frames.extend(list(self.audio_buffer))
 
@@ -115,9 +115,10 @@ class VoiceActivityDetector:
             audio_stream = io.BytesIO(wav_data)
             audio_stream.name = "audio.wav"
             transcript = await self.client.audio.transcriptions.create(
-                model="whisper-1", file=audio_stream, response_format="text"
+                model="whisper-1", file=audio_stream, response_format="text", language="en"
             )
-            await self.queue.put(transcript)
+            await self.interruption_queue.put(transcript)
+            print("VoiceActivityDetector - Added to queue:", transcript)
 
         except Exception as e:
             print("Failed to transcribe:", str(e))

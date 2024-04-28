@@ -1,7 +1,4 @@
 import asyncio
-import websockets
-import os
-import json
 import pyaudio
 import base64
 from io import BytesIO
@@ -22,7 +19,6 @@ class AudioOutput:
         loop.create_task(self.play_audio())
     
     async def play_audio(self):
-        # TODO: play the audio lollllllllllllllllllllllllll
         p = pyaudio.PyAudio()
         stream = p.open(
             format=pyaudio.paInt16,
@@ -31,34 +27,46 @@ class AudioOutput:
             output=True,
         )
         while True:
-            while not self.stop_event.is_set():
-                data = await self.audio_queue.get()
-                self.audio_queue.task_done()
-                
-                if data == None:
-                    self.history += [{"role": "assistant", "content": self.text}]
-                    self.text = ""
-                    continue
-                
-                audio = base64.b64decode(data["audio"])
-                message = data["text"]
-                audio_segment = AudioSegment.from_file(BytesIO(audio))
-                
-                # Save the audio to a file
-                audio_segment.export("output.wav", format="wav")
-                
-                # Play the audio
-                print("Playing audio:", message)
-                self.text += message
-                stream.write(audio_segment.raw_data)
-                
-            # Clear the queue
-            while not self.audio_queue.empty():
-                self.audio_queue.get_nowait()
-                self.audio_queue.task_done()
-                
-            if self.text != "":
-                self.history += [{"role": "assistant", "content": self.text + "User Interrupted"}]
+            data = await self.audio_queue.get()
+            self.audio_queue.task_done()
+            
+            if data == None:
+                self.history += [{"role": "assistant", "content": self.text}]
                 self.text = ""
+                continue
+            
+            audio = base64.b64decode(data["audio"])
+            message = data["text"]
+            audio_segment = AudioSegment.from_file(BytesIO(audio))
+            
+            # Save the audio to a file
+            audio_segment.export("output.wav", format="wav")
+            
+            # Play the audio
+            self.text += message
+            
+            frame_count = int(audio_segment.frame_rate * 0.1)  # Calculate frame count for 0.1 seconds
+            total_frames = len(audio_segment.get_array_of_samples())
+            for i in range(0, total_frames, frame_count):
+                if self.stop_event.is_set():
+                    print("AudioOutput - Stop Triggered")
+                    
+                    # Clear the queue
+                    while not self.audio_queue.empty():
+                        self.audio_queue.get_nowait()
+                        self.audio_queue.task_done()
+                    print("AudioOutput - Cleared the audio queue.")
+                        
+                    if self.text != "":
+                        self.history += [{"role": "assistant", "content": self.text + "User Interrupted"}]
+                        self.text = ""
+                        
+                    break
+                    
+                end_frame = min(i + frame_count, total_frames)
+                chunk = audio_segment[i:end_frame].raw_data
+                stream.write(chunk)
+                
+            
             
             
