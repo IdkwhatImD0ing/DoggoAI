@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Home, Cross, HeartHandshake } from "lucide-react";
+import { Home, HeartHandshake, Mic2 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +18,8 @@ const LINKS = [
     },
     {
         id: 3,
-        icon: Cross,
-        link: "/health",
+        icon: Mic2,
+        link: "/live",
     },
 ];
 
