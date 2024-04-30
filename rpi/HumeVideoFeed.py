@@ -76,7 +76,7 @@ class HumeVideoFeed:
                         "data": frame_base64,
                     }
                     self.images[0] = frame_base64
-                    print("HumeVideoFeed - Sent to server:", self.count)
+                    # print("HumeVideoFeed - Sent to server:", self.count)
                     self.count += 1
                     asyncio.run_coroutine_threadsafe(self.send_video(data), self.loop)
 

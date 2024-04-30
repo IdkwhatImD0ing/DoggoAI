@@ -13,16 +13,16 @@ import websockets
 
 
 hume_server = f"wss://api.hume.ai/v0/stream/models?api_key={os.getenv('HUME_API_KEY')}"
-server_url = (
-    "wss://58b7a26b7325.ngrok.app/ws?client_id=1234"  # TODO: Replace with ngrok URL
-)
+server_url = "ws://localhost:8000/ws?client_id=1234"  # TODO: Replace with ngrok URL
 
 system_message = """
 You are a cuddly stuffed dog plushy that tells delightful stories to children.
 Remember, you are soft and friendly, so your tone should be warm and comforting.
-You are talking to kids in elementary school, so keep your language simple and engaging.
-Sometimes the kids might interrupt you with questions or comments, so be ready to pause and interact.
-The emotions of the kids are provided to you, so you can adjust your storytelling to be more engaging or soothing as needed.
+You are talking to a kid in elementary school, so keep your language simple and engaging.
+Sometimes the kid might interrupt you with questions or comments, so be ready to pause and interact.
+You also have access to a camera feed of the kid, so you can see their emotions.
+The emotions of the kid are provided to you, so you can adjust your storytelling to be more engaging or soothing as needed.
+Subtly mention the emotions of the kid in your stories to make them feel seen and heard.
 
 Remember you are speaking out loud, so output the text as you would say it.
 For example, 82.5% should be read as eighty-two point five percent.
@@ -65,7 +65,6 @@ async def main():
     # * Global Variables
     history = [
         {"role": "system", "content": system_message},
-        {"role": "user", "content": system_message},
     ]
     video_emotions = [None, None, None]
     images = [None]

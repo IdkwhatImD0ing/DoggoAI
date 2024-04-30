@@ -161,12 +161,12 @@ class VoiceActivityDetector:
                 await self.send_data(json.dumps(emotion_context))
             except Exception as e:
                 print("Failed to send to server:", str(e))
-
-            pretty_emotions = "Voice Emotions:\n"
-            for i, emotion in enumerate(audio_emotions):
-                pretty_emotions += (
-                    f"Emotion {i + 1}: {emotion['emotion']} ({emotion['score']:.2%})\n"
-                )
+            try:
+                pretty_emotions = "Voice Emotions:\n"
+                for i, emotion in enumerate(audio_emotions):
+                    pretty_emotions += f"Emotion {i + 1}: {emotion['emotion']} ({emotion['score']:.2%})\n"
+            except Exception as e:
+                print("Failed to format emotions:", str(e))
 
             emotion_context = {
                 "transcript": transcript,

@@ -104,7 +104,6 @@ class LLMGenerator:
         except Exception as e:
             print("Error in process_llm:", str(e))
 
-        print(response)
         text_generator = text_chunker(response)
         async for chunk in text_generator:
             if self.stop_event.is_set():
